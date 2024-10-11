@@ -489,7 +489,7 @@
 	return FALSE
 
 /obj/structure/vehicleparts/frame/bullet_act(var/obj/item/projectile/proj, var/penloc = "front")
-	if(proj.fired_from_turret && proj.fired_from_axis) // пуля выпущеная из башни не имеет препятсятвий внутри той техники где она была выпущена
+	if(proj.fired_from_roof && proj.fired_from_axis) // пуля выпущеная из башни не имеет препятсятвий внутри той техники где она была выпущена
 		if(proj.fired_from_axis == axis)
 			return
 	if (mwheel && prob(30))
@@ -529,6 +529,7 @@
 								visible_message("<span class='danger'>\The [mwheel.name] breaks down!</span>")
 								new/obj/effect/effect/smoke/small(loc)
 								update_icon()
+				mwheel.update_icon()
 			else
 				var/damage_modifier = proj.heavy_armor_penetration
 				if(wall_armor(penloc) > heavy_armor_penetration)
@@ -592,9 +593,11 @@
 			playsound(loc, pick('sound/effects/explosion1.ogg','sound/effects/explosion1.ogg'),100, TRUE)
 			playsound(loc, 'sound/tank/bronja-ne-probita.ogg')
 		try_destroy()
+		update_icon()
 		return
 	else
 		..()
+		update_icon()
 
 /obj/structure/vehicleparts/frame/proc/try_destroy()
 	//format: type of wall, opacity, density, armor, current health, can open/close, is open?
@@ -627,9 +630,12 @@
 	if (w_left[5]+w_right[5]+w_back[5]+w_front[5] <= 0)
 		broken = TRUE
 		if (prob(10))
-			Destroy()
+			Destroy()	
 	update_icon()
 /obj/structure/vehicleparts/frame/Destroy()
+	if (broken)
+		visible_message("<span class='danger'>The frame gets wrecked!</span>")
+		return
 	if (!broken)
 		visible_message("<span class='danger'>The frame gets wrecked!</span>")
 		update_icon()
